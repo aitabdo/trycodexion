@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by abdo.*
+*This project has been created as part of the 42 curriculum by abdait-s*
 
 # Codexion
 
@@ -100,8 +100,6 @@ rejected with a usage message.
   waiters; coder threads check them at every step of their loop and exit
   cleanly.
 
-No global variables are used: everything lives in one `t_sim` structure
-whose pointers are passed to the threads.
 
 ## Resources
 
@@ -115,8 +113,7 @@ whose pointers are passed to the threads.
 
 ### Use of AI
 
-AI was used as a study helper: brainstorming the deadlock-free acquisition
-order, double checking my understanding of `pthread_cond_timedwait`
-semantics, and reviewing this README wording. All the code was read,
-tested (including valgrind leak checks and timing tests) and fully
-understood by me before being kept.
+AI was used as a study helper functions : brainstorming the deadlock-free acquisition
+order, checking my understanding of `pthread_cond_timedwait`
+semantics, and reviewing this README as well. all the code was read,
+tested and fully understood by me before being pushed to the intra .
