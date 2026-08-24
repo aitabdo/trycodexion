@@ -6,7 +6,7 @@
 /*   By: abdait-s <abdait-s@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 11:49:31 by abdait-s          #+#    #+#             */
-/*   Updated: 2026/08/24 12:27:48 by abdait-s         ###   ########.fr       */
+/*   Updated: 2026/08/24 12:47:26 by abdait-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static int	is_num(char *str)
 		return (0);
 	while (str[i])
 	{
-		if (str[i] == '0')
+		if (str[i] == '0' && i == 0)
 			return 0;
 		if (str[i] < '0' || str[i] > '9')
 			return (0);
