@@ -1,7 +1,7 @@
 NAME = codexion
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
-SRC = main.c coder.c dongle.c monitor.c heap.c utils.c
+SRC = main.c coder.c dongle.c monitor.c heap.c utils.c utile1.c
 OBJ = $(SRC:.c=.o)
 HDR = codexion.h
 

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monitor.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: abdait-s <abdait-s@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/24 11:49:33 by abdait-s          #+#    #+#             */
+/*   Updated: 2026/08/24 11:49:33 by abdait-s         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "codexion.h"
 
 /*
@@ -6,43 +18,43 @@
 ** polling at 1ms keeps us way inside the 10ms tolerance.
 */
 
-void    *watch(void *arg)
+void	*watch(void *arg)
 {
-    t_sim       *s;
-    long long   now;
-    int         victim;
-    int         burned;
-    int         i;
+	t_sim		*s;
+	long long	now;
+	int			victim;
+	int			burned;
+	int			i;
 
-    s = (t_sim *)arg;
-    while (!sim_over(s))
-    {
-        usleep(1000);
-        burned = 0;
-        victim = 0;
-        pthread_mutex_lock(&s->data_lock);
-        if (!s->burnout && !s->all_done)
-        {
-            now = now_ms();
-            i = 0;
-            while (i < s->nb_coders)
-            {
-                if (now > s->c[i].deadline)
-                {
-                    s->burnout = 1;
-                    burned = 1;
-                    victim = s->c[i].id;
-                    break ;
-                }
-                i++;
-            }
-        }
-        pthread_mutex_unlock(&s->data_lock);
-        if (burned)
-        {
-            log_state(s, victim, MSG_BURN);
-            wake_all(s);
-        }
-    }
-    return (NULL);
+	s = (t_sim *)arg;
+	while (!sim_over(s))
+	{
+		usleep(1000);
+		burned = 0;
+		victim = 0;
+		pthread_mutex_lock(&s->data_lock);
+		if (!s->burnout && !s->all_done)
+		{
+			now = now_ms();
+			i = 0;
+			while (i < s->nb_coders)
+			{
+				if (now > s->c[i].deadline)
+				{
+					s->burnout = 1;
+					burned = 1;
+					victim = s->c[i].id;
+					break ;
+				}
+				i++;
+			}
+		}
+		pthread_mutex_unlock(&s->data_lock);
+		if (burned)
+		{
+			log_state(s, victim, MSG_BURN);
+			wake_all(s);
+		}
+	}
+	return (NULL);
 }
