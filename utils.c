@@ -28,8 +28,13 @@ void	msleep(long long ms)
 /* all logs go through here so lines can never mix together */
 void	log_state(t_sim *s, int id, const char *msg)
 {
+	int	show;
+
 	pthread_mutex_lock(&s->print_lock);
-	if (!s->burnout || strcmp(msg, MSG_BURN) == 0)
+	pthread_mutex_lock(&s->data_lock);
+	show = (!s->burnout || strcmp(msg, MSG_BURN) == 0);
+	pthread_mutex_unlock(&s->data_lock);
+	if (show)
 		printf("%lld %d %s\n", now_ms() - s->sim_start, id, msg);
 	pthread_mutex_unlock(&s->print_lock);
 }

@@ -6,7 +6,7 @@
 /*   By: abdait-s <abdait-s@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 11:54:45 by abdait-s          #+#    #+#             */
-/*   Updated: 2026/08/24 12:20:50 by abdait-s         ###   ########.fr       */
+/*   Updated: 2026/08/26 10:57:01 by abdait-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,5 +104,8 @@ void					*coder_life(void *arg);
 void					*watch(void *arg);
 void					cleanup(t_sim *s);
 int						arg_error(void);
+void					init_coder(t_sim *s, int i);
+int						alloc_sim_arrays(t_sim *s);
+int						init_dongle(t_sim *s, int i);
 
-# endif
+#endif

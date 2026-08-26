@@ -6,7 +6,7 @@
 /*   By: abdait-s <abdait-s@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 11:49:20 by abdait-s          #+#    #+#             */
-/*   Updated: 2026/08/24 11:59:24 by abdait-s         ###   ########.fr       */
+/*   Updated: 2026/08/26 10:45:26 by abdait-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,28 @@ static void	retire(t_coder *me)
 	pthread_mutex_unlock(&me->sim->data_lock);
 }
 
+static int	do_compile_cycle(t_sim *s, t_coder *me)
+{
+	if (take_dongle(s, me, me->first))
+		return (1);
+	if (take_dongle(s, me, me->second))
+	{
+		drop_dongle(s, me->first);
+		return (1);
+	}
+	start_compile(me);
+	log_state(s, me->id, MSG_COMPILE);
+	msleep(s->t_compile);
+	drop_dongle(s, me->second);
+	drop_dongle(s, me->first);
+	if (s->min_compiles > 0 && me->compiles >= s->min_compiles)
+	{
+		retire(me);
+		return (1);
+	}
+	return (0);
+}
+
 void	*coder_life(void *arg)
 {
 	t_coder	*me;
@@ -53,31 +75,16 @@ void	*coder_life(void *arg)
 	s = me->sim;
 	while (!sim_over(s))
 	{
-		if (take_dongle(s, me, me->first))
+		if (do_compile_cycle(s, me))
 			break ;
-		if (take_dongle(s, me, me->second))
-		{
-			drop_dongle(s, me->first);
-			break ;
-		}
-		start_compile(me);
-		log_state(s, me->id, MSG_COMPILE);
-		msleep(s->t_compile);
-		drop_dongle(s, me->second);
-		drop_dongle(s, me->first);
-		if (s->min_compiles > 0 && me->compiles >= s->min_compiles)
-		{
-			retire(me);
-			break ;
-		}
 		if (sim_over(s))
 			break ;
 		log_state(s, me->id, MSG_DEBUG);
 		msleep(s->t_debug);
 		if (sim_over(s))
 			break ;
-		log_state(s, me->id, MSG_REFACTOR);
 		msleep(s->t_refactor);
+		log_state(s, me->id, MSG_REFACTOR);
 	}
 	return (NULL);
 }

@@ -6,7 +6,7 @@
 /*   By: abdait-s <abdait-s@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/24 11:49:31 by abdait-s          #+#    #+#             */
-/*   Updated: 2026/08/24 12:47:26 by abdait-s         ###   ########.fr       */
+/*   Updated: 2026/08/26 11:11:15 by abdait-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,6 @@ static int	is_num(char *str)
 		return (0);
 	while (str[i])
 	{
-		if (str[i] == '0' && i == 0)
-			return 0;
 		if (str[i] < '0' || str[i] > '9')
 			return (0);
 		i++;
@@ -65,34 +63,16 @@ static int	setup(t_sim *s)
 	int	i;
 
 	s->sim_start = now_ms();
-	s->d = malloc(sizeof(t_dongle) * s->nb_coders);
-	s->c = malloc(sizeof(t_coder) * s->nb_coders);
-	if (!s->d || !s->c)
+	if (alloc_sim_arrays(s))
 		return (1);
-	memset(s->d, 0, sizeof(t_dongle) * s->nb_coders);
-	memset(s->c, 0, sizeof(t_coder) * s->nb_coders);
 	pthread_mutex_init(&s->data_lock, NULL);
 	pthread_mutex_init(&s->print_lock, NULL);
 	i = 0;
 	while (i < s->nb_coders)
 	{
-		s->c[i].id = i + 1;
-		s->c[i].first = i;
-		s->c[i].second = (i + 1) % s->nb_coders;
-		if (s->c[i].second < s->c[i].first)
-		{
-			s->c[i].first = s->c[i].second;
-			s->c[i].second = i;
-		}
-		s->c[i].deadline = s->sim_start + s->t_burnout;
-		s->c[i].sim = s;
-		pthread_mutex_init(&s->d[i].lock, NULL);
-		pthread_cond_init(&s->d[i].cond, NULL);
-		if (!heap_init(&s->d[i].q, s->nb_coders))
-		{
-			heap_free(&s->d[i].q);
+		init_coder(s, i);
+		if (init_dongle(s, i))
 			return (1);
-		}
 		i++;
 	}
 	if (s->min_compiles == 0)
@@ -105,7 +85,6 @@ static void	run(t_sim *s)
 	pthread_t	monitor;
 	int			has_monitor;
 	int			started;
-	int			i;
 
 	has_monitor = 0;
 	started = 0;
@@ -119,16 +98,11 @@ static void	run(t_sim *s)
 		}
 		started++;
 	}
-	if (!pthread_create(&monitor, NULL, watch, s))
-		has_monitor = 1;
-	else
+	has_monitor = pthread_create(&monitor, NULL, watch, s);
+	if (has_monitor)
 		set_stop(s);
-	i = 0;
-	while (i < started)
-	{
-		pthread_join(s->c[i].tid, NULL);
-		i++;
-	}
+	while (started > 0)
+		pthread_join(s->c[--started].tid, NULL);
 	if (has_monitor)
 		pthread_join(monitor, NULL);
 }
